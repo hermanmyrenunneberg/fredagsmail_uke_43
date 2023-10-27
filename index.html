@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monty Hall Game</title>
+  <style>
+    body {
+      text-align: center;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    .doors {
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .door {
+      width: 100px;
+      height: 150px;
+      border: 2px solid black;
+      text-align: center;
+      line-height: 150px;
+      font-size: 24px;
+      cursor: pointer;
+      margin: 0 10px;
+    }
+    .door.open {
+      background-color: lightgray;
+    }
+    .door.empty {
+      background-color: lightcoral;
+      cursor: default;
+    }
+    .door.winning {
+      background-color: lightgreen;
+    }
+    .message {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+    }
+    .events {
+      margin-top: 20px;
+      display: none;
+    }
+    .events strong {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Monty Hall Game</h1>
+  <div class="doors">
+    <div class="door" onclick="chooseDoor(1)">1</div>
+    <div class="door" onclick="chooseDoor(2)">2</div>
+    <div class="door" onclick="chooseDoor(3)">3</div>
+  </div>
+  <div class="message"></div>
+  <button onclick="restartGame()" style="display:none;">Restart Game</button>
+
+  <div class="events">
+    <h2>Things to do in Oslo This Week</h2>
+    <p><strong>Dj Ursula i Leiligheten:</strong> Dans, karaoke, partyleker, og kostymekonkurranse. <strong>Fredag fra kl. 22. Pris: 200,-</strong></p>
+    <p><strong>Nasjonalmuseet + Trekanten:</strong> Senfredag med minikonserter, spåing i tarotkort og Dj-er. <strong>Fredag kl. 19–03. Pris: 200,- på museet og 120–180,- på Trekanten</strong></p>
+    <p><strong>Live-konsert på Jaeger:</strong> Funk For Forrest konsert. <strong>Lørdag fra kl. 22. Pris: 200,-</strong></p>
+    <p><strong>Høstmarked i Oslobukta:</strong> God råvarer og mat fra lokale gårder og spisesteder. <strong>Lørdag kl. 11–17</strong></p>
+    <p><strong>Kultur’ish på Salt:</strong> Show med komikere med minoritetsbakgrunn. <strong>Fredag fra kl. 19. Gratis, men krever billett</strong></p>
+    <p><strong>Fest i fjøset:</strong> Oslo Negativ Fotofestival avslutningsfest med vin- og grillfest. <strong>Lørdag fra kl. 18. Sted: General Birchs gate 3</strong></p>
+  </div>
+
+  <script>
+    let prizeDoor = Math.ceil(Math.random() * 3);
+    let chosenDoor = null;
+    let openedDoor = null;
+
+    function chooseDoor(door) {
+      if (chosenDoor === null) {
+        chosenDoor = door;
+        openADoor();
+      } else if (door !== openedDoor && !document.querySelector('.doors .door:nth-child(' + door + ')').classList.contains('empty')) {
+        revealResult(door);
+      }
+    }
+
+    function openADoor() {
+      do {
+        openedDoor = Math.ceil(Math.random() * 3);
+      } while (openedDoor === chosenDoor || openedDoor === prizeDoor);
+
+      const doorElement = document.querySelector('.doors .door:nth-child(' + openedDoor + ')');
+      doorElement.classList.add('open', 'empty');
+      doorElement.textContent = 'Empty';
+      showMessage('Do you want to stick with door ' + chosenDoor + ' or switch?');
+    }
+
+    function revealResult(finalChoice) {
+      const doors = document.querySelectorAll('.door');
+      doors[prizeDoor - 1].classList.add('open');
+      if (finalChoice === prizeDoor) {
+        showMessage('Congratulations! You won!');
+        document.querySelector('.doors .door:nth-child(' + prizeDoor + ')').classList.add('winning');
+        document.querySelector('.events').style.display = 'block';
+      } else {
+        showMessage('Sorry, you lost. The prize was behind door ' + prizeDoor);
+      }
+      document.querySelector('button').style.display = 'block';
+    }
+
+    function showMessage(msg) {
+      document.querySelector('.message').innerText = msg;
+    }
+
+    function restartGame() {
+      prizeDoor = Math.ceil(Math.random() * 3);
+      chosenDoor = null;
+      openedDoor = null;
+      document.querySelector('button').style.display = 'none';
+      const doors = document.querySelectorAll('.door');
+      doors.forEach(door => {
+        door.classList.remove('open', 'empty', 'winning');
+        door.textContent = door.dataset.number;
+      });
+      showMessage('');
+      document.querySelector('.events').style.display = 'none';
+    }
+
+    // Setting data-number attributes to store initial door numbers
+    document.querySelectorAll('.door').forEach((door, index) => {
+      door.dataset.number = index + 1;
+    });
+  </script>
+</body>
+</html>
+
+
